@@ -11,5 +11,6 @@ urlpatterns = [
     path('cadastar_categoria/', cadastrar_categoria, name='cadastrar_categoria'),
     path('editar_categoria/<int:id>', editar_categoria, name='editar_categoria'),
     path('excluir_categoria/<int:id>', excluir_categoria, name='excluir_categoria'),
+    path('search', search, name='search')
     # Add your URL patterns here
 ]

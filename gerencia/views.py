@@ -100,7 +100,7 @@ def cadastrar_categoria(request):
     else:
         form=CategoriaForm()
     
-    categorias=Categoria.objects.all()
+    categorias=Categoria.objects.all().order_by('nome')
     return render(request, 'gerencia/cadastro_categoria.html', {'form': form, 'categorias': categorias})
 
 def editar_categoria(request,id):
@@ -121,3 +121,11 @@ def excluir_categoria(request, id):
     categoria=Categoria.objects.get(id=id)
     categoria.delete()
     return redirect('gerencia:cadastrar_categoria')
+
+def search(request):
+    search=request.GET.get('search')
+    if search:
+        categorias=Categoria.objects.filter(nome__icontains=search).order_by('nome')
+    else:
+        categorias = Categoria.objects.none()
+    return render(request, 'gerencia/search.html', {'categorias': categorias})
