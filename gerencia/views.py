@@ -1,4 +1,4 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect, HttpResponse
 from .forms import NoticiaForm, NoticiaFilterForm, CategoriaForm
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
@@ -79,7 +79,7 @@ def index(request):
     if search_query:
         noticias = noticias.filter(titulo__icontains=search_query)  # Filtra por título, ignorando maiúsculas/minúsculas
 
-    categorias = Categoria.objects.all()  # Pega todas as categorias para exibir no template
+    categorias = Categoria.objects.all().order_by('nome')  # Pega todas as categorias para exibir no template
 
     contexto = {
         'noticias': noticias,
@@ -88,13 +88,18 @@ def index(request):
         'search_query': search_query,
     }
     return render(request, 'gerencia/index.html', contexto)
-
+@staff_member_required(login_url='login')
 def cadastrar_categoria(request):
     if request.method =='POST':
         form=CategoriaForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('gerencia:cadastrar_categoria')
+            categoria=form.save(commit=False)
+            nome_igual=Categoria.objects.filter(nome=categoria.nome)
+            if nome_igual:
+                return HttpResponse('Essa categoria já foi cadastrada. Tente cadastrar outra')
+            else:
+                form.save()
+                return redirect('gerencia:cadastrar_categoria')
         else:
             print(form.errors)
     else:
@@ -102,7 +107,7 @@ def cadastrar_categoria(request):
     
     categorias=Categoria.objects.all().order_by('nome')
     return render(request, 'gerencia/cadastro_categoria.html', {'form': form, 'categorias': categorias})
-
+@staff_member_required(login_url='login')
 def editar_categoria(request,id):
     categoria=Categoria.objects.get(id=id)
     if request.method =='POST':
@@ -116,12 +121,13 @@ def editar_categoria(request,id):
         form=CategoriaForm(instance=categoria)
     return render(request, 'gerencia/cadastro_categoria.html', {'form': form})
 
-
+@staff_member_required(login_url='login')
 def excluir_categoria(request, id):
     categoria=Categoria.objects.get(id=id)
     categoria.delete()
     return redirect('gerencia:cadastrar_categoria')
 
+@staff_member_required(login_url='login')
 def search(request):
     search=request.GET.get('search')
     if search:
