@@ -1,5 +1,6 @@
 from django.shortcuts import render,redirect
-from .forms import NoticiaForm, NoticiaFilterForm
+from .forms import NoticiaForm, NoticiaFilterForm, CategoriaForm
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from .models import Noticia, Categoria
@@ -64,8 +65,6 @@ def editar_noticia(request, id):
     return render(request, 'gerencia/cadastro_noticia.html',contexto)
 
 
-
-
 def index(request):
     categoria_nome = request.GET.get('categoria')  # Obtém o parâmetro 'categoria' da URL
     search_query = request.GET.get('search')  # Obtém o parâmetro de busca
@@ -89,3 +88,36 @@ def index(request):
         'search_query': search_query,
     }
     return render(request, 'gerencia/index.html', contexto)
+
+def cadastrar_categoria(request):
+    if request.method =='POST':
+        form=CategoriaForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('gerencia:cadastrar_categoria')
+        else:
+            print(form.errors)
+    else:
+        form=CategoriaForm()
+    
+    categorias=Categoria.objects.all()
+    return render(request, 'gerencia/cadastro_categoria.html', {'form': form, 'categorias': categorias})
+
+def editar_categoria(request,id):
+    categoria=Categoria.objects.get(id=id)
+    if request.method =='POST':
+        form=CategoriaForm(request.POST, instance=categoria)
+        if form.is_valid():
+            form.save()
+            return redirect('gerencia:cadastrar_categoria')
+        else:
+            print(form.errors)
+    else:
+        form=CategoriaForm(instance=categoria)
+    return render(request, 'gerencia/cadastro_categoria.html', {'form': form})
+
+
+def excluir_categoria(request, id):
+    categoria=Categoria.objects.get(id=id)
+    categoria.delete()
+    return redirect('gerencia:cadastrar_categoria')

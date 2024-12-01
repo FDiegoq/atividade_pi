@@ -22,7 +22,7 @@ from django.conf.urls.static import static
 from gerencia.views import index
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('',index,name='index' ), # index
+    path('', index, name='index' ), # index
     path('usuario/',include('usuarios.urls')),
     path('gerencia/',include('gerencia.urls')),
     path('curso/<int:curso_id>',views.detalhe_curso,name='detalhe_curso'),
