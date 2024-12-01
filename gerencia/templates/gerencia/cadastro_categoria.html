@@ -1,6 +1,20 @@
 {% extends 'base_gerencia.html' %}
 
 {% block main %}
+
+<form class="form-inline mr-auto w-100 navbar-search" method="get" action="{%url 'gerencia:search' %}">
+    <div class="input-group">
+        <input type="text" class="form-control bg-light border-0 small"
+            placeholder="Search for..." aria-label="Search"
+            aria-describedby="basic-addon2" name="search">
+        <div class="input-group-append">
+            <input class="btn btn-primary" type="submit" value="Buscar">
+            </input>
+        </div>
+    </div>
+</form>
+
+
 <h2>Cadastre uma categoria</h2>
 <form action="" method="post" class="">
     {% csrf_token %}
