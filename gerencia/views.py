@@ -4,6 +4,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from .models import Noticia, Categoria
+from django.core.paginator import Paginator
 
 # Create your views here.
 @login_required
@@ -88,6 +89,7 @@ def index(request):
         'search_query': search_query,
     }
     return render(request, 'gerencia/index.html', contexto)
+
 @staff_member_required(login_url='login')
 def cadastrar_categoria(request):
     if request.method =='POST':
@@ -106,6 +108,10 @@ def cadastrar_categoria(request):
         form=CategoriaForm()
     
     categorias=Categoria.objects.all().order_by('nome')
+    paginator = Paginator(categorias, 3)  # 10 usuários por página
+    page = request.GET.get('page', 1)
+    categorias = paginator.page(page)
+
     return render(request, 'gerencia/cadastro_categoria.html', {'form': form, 'categorias': categorias})
 @staff_member_required(login_url='login')
 def editar_categoria(request,id):
